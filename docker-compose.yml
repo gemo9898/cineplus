@@ -1,0 +1,57 @@
+networks:
+  cineplus.net:
+    driver: bridge
+
+services:
+  api.cineplus:
+    build:
+      context: build
+      dockerfile: Dockerfile
+    env_file: cineplus.env
+    ports:
+      - '48013:80'
+    volumes:
+      - ./app:/var/php
+    working_dir: /var/php
+    networks:
+      - cineplus.net
+    depends_on:
+      - cineplus.db
+    command: php -S 0.0.0.0:80 -t /var/php/public
+
+  cineplus.db:
+    image: 'postgres:latest'
+    env_file: cineplusdb.env
+    ports:
+      - '48011:5432'
+    networks:
+      - cineplus.net
+    volumes:
+      - ./app/sql:/var/sql
+
+  adminer:
+    image: adminer
+    ports:
+      - '48012:8080'
+    networks:
+      - cineplus.net
+
+  front.cineplus:
+    build:
+      context: .
+      dockerfile: Frontend/Dockerfile
+    ports:
+      - "48010:48010"
+    volumes:
+      - ./Frontend:/usr/src/app/Frontend
+      - /usr/src/app/Frontend/node_modules
+    environment:
+      - NODE_ENV=development
+      - PORT=48010
+    networks:
+      - cineplus.net
+    depends_on:
+      - api.cineplus
+    command: >
+      sh -c "npm run build &&
+             npm run dev"
