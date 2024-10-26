@@ -17,24 +17,6 @@ class PdoFilmRepository implements FilmRepositoryInterface
         $this->pdo = $pdo;
     } 
 
-    // public function getFilms(): array
-    // {
-    //     $query = "SELECT * FROM films";
-    //     $stmt = $this->pdo->query($query);
-    //     $films = $stmt->fetchAll();
-    //     $filmEntities = [];
-    //     foreach ($films as $film) {
-    //         $filmEntity = new Film(
-    //             $film['title'],
-    //              $film['director'], 
-    //              $film['release_year'], 
-    //              $film['category']
-    //         );
-    //         $filmEntity->setID($film['id_film']);
-    //         $filmEntities[] = $filmEntity;
-    //     }
-    //     return $filmEntities;
-    // }
 
     public function getfilms(): array
     {
@@ -64,6 +46,29 @@ class PdoFilmRepository implements FilmRepositoryInterface
 
         } catch (\PDOException $e) {
             throw new \Exception("Erreur PDO lors de la récupération des films : " . $e->getMessage());
+        }
+    }
+
+    public function getFilmById(string $id): Film
+    {
+        try {
+            $query = "SELECT * FROM FILMS WHERE id_film =:id";
+            $stmt = $this->pdo->prepare($query);
+            $stmt -> execute(['id'=>$id]);
+            $film = $stmt->fetch();
+            if ($film === false) {
+                throw new RepositoryEntityNotFoundException("Film $id no encontrado");
+            }
+            $film=new Film(
+                $film["id_film"],
+                $film["title"],
+                $film["director"],
+                $film["release_year"],
+                $film["category"]                
+            );
+            return $film;
+        } catch (\PDOException $e) {
+            throw new \Exception("Error PDO al recuperar el film $id". $e->getMessage());
         }
     }
 

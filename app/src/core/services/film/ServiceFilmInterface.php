@@ -8,4 +8,6 @@ interface ServiceFilmInterface
     
     public function getfilms(): array;
 
+    public function getFilmById(string $id): filmDTO;
+
 }

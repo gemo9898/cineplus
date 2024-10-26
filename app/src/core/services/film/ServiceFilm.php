@@ -3,6 +3,7 @@ namespace nrv\core\services\film;
 
 use nrv\core\dto\filmDTO;
 use nrv\core\repositoryInterfaces\FilmRepositoryInterface;
+use nrv\core\repositoryInterfaces\RepositoryEntityNotFoundException;
 
 class ServiceFilm  implements ServiceFilmInterface
 {
@@ -22,4 +23,16 @@ class ServiceFilm  implements ServiceFilmInterface
         }
         return $filmsDTO;
     }
+
+    public function getFilmById(string $id): filmDTO
+    {
+        try {
+            return $this->filmRepository->getFilmById($id)->toDTO();
+        } catch (RepositoryEntityNotFoundException $e) {
+            throw new ServiceFilmNotFoundException ($e->getMessage());
+        }catch (\Exception $e) {
+            throw new \Exception($e ->getMessage());
+        }
+    }
+    
 }

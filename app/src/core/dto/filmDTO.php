@@ -20,6 +20,6 @@ class filmDTO  extends DTO{
 
     public function toEntity(): Film
     {
-        return new Film($this->title, $this->director, $this->release_year, $this->category);   
+        return new Film($this->id_film, $this->title, $this->director, $this->release_year, $this->category);   
     }
 }
